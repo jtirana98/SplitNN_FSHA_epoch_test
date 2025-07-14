@@ -166,7 +166,7 @@ class FSHA:
         control = self.decoder(z_private_control, training=False)
         return tilde_x_private.numpy(), control.numpy()
 
-
+    # EDWWWW
     def __call__(self, iterations, log_frequency=500, verbose=False, progress_bar=True):
 
         n = int(iterations / log_frequency)
