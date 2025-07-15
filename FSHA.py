@@ -80,9 +80,7 @@ class FSHA:
 
     @tf.function
     def train_step(self, x_private, x_public, label_private, label_public):
-        print('here')
         with tf.GradientTape(persistent=True) as tape:
-            print('here2')
             #### Virtually, ON THE CLIENT SIDE:
             # clients' smashed data
             z_private = self.f(x_private, training=True)
@@ -211,16 +209,14 @@ class FSHA:
 
         i, j = 0, 0
         self.logger.info("RUNNING...")
-        print('RUNNING')
         for (x_private, label_private), (x_public, label_public) in iterator:
             log = self.train_step(x_private, x_public, label_private, label_public)
-
             if i == 0:
-                VAL = log[3]
+                VAL = log[3] 
                 VAL_A = log[4]
             else:
-                VAL += log[3] / log_frequency
-                VAL_A += log[4] / log_frequency
+                VAL += log[3] / (log_frequency)
+                VAL_A += log[4] / (log_frequency)
 
             if  i % log_frequency == 0:
                 LOG[j] = log
@@ -229,6 +225,7 @@ class FSHA:
                     self.logger.info("log--%02d%%-%07d] validation: %0.4f acc: %0.4f" % ( int(i/iterations*100) ,i, VAL, VAL_A) )
 
                 VAL = 0
+                VAL_A = 0
                 j += 1
 
 

@@ -51,5 +51,5 @@ plot_log(ax[0], x, LOG[:, 0], label='Loss $f$')
 plot_log(ax[1], x, LOG[:, 1],  label='Loss $\\tilde{f}$ and $\\tilde{f}^{-1}$')
 plot_log(ax[2], x, LOG[:, 2],  label='Loss $D$')
 plot_log(ax[3], x, LOG[:, 3],  label='Reconstruction error (VALIDATION)')
+plot_log(ax[4], x, LOG[:, 4],  label='Accuracy of the model f+D')
 
-### TODO: we need to plot tge accuracct of D, too.
