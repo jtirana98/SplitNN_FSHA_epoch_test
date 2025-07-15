@@ -1,7 +1,11 @@
 import tensorflow as tf
 import numpy as np
 import tqdm
+import logging
 import datasets, architectures
+import os
+import time
+import datetime
 
 def distance_data_loss(a,b):
     l = tf.losses.MeanSquaredError()
@@ -17,31 +21,56 @@ class FSHA:
         return make_decoder(z_shape, channels=channels)
         
     def __init__(self, xpriv, xpub, id_setup, batch_size, hparams):
-            input_shape = xpriv.element_spec[0].shape
-            
-            self.hparams = hparams
+        logdir = 'logs_training'
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
 
-            # setup dataset
-            self.client_dataset = xpriv.batch(batch_size, drop_remainder=True).repeat(-1)
-            self.attacker_dataset = xpub.batch(batch_size, drop_remainder=True).repeat(-1)
-            self.batch_size = batch_size
+        while True:
+            log_file_name = 'experiment_log-%s' % (datetime.datetime.now().strftime("%Y-%m-%d-%H:%M-%S"))
+            log_path = log_file_name+'.log'
+        
+            if not os.path.exists(os.path.join(logdir, log_path)):
+                break
+            else:
+                time.sleep(1)
+        
+        logging.basicConfig(
+            filename=os.path.join(logdir, log_path),
+            format='%(asctime)s %(levelname)-8s %(message)s',
+            datefmt='%m-%d %H:%M', level=logging.DEBUG, filemode='w'
+        )
 
-            ## setup models
-            make_f, make_tilde_f, make_decoder, make_D = architectures.SETUPS[id_setup]
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.INFO)
+        self.logger.info("#" * 100)
 
-            self.f = make_f(input_shape)
-            self.tilde_f = make_tilde_f(input_shape)
 
-            assert self.f.output.shape.as_list()[1:] == self.tilde_f.output.shape.as_list()[1:]
-            z_shape = self.tilde_f.output.shape.as_list()[1:]
 
-            self.D = make_D(z_shape)
-            self.decoder = self.loadBiasNetwork(make_decoder, z_shape, channels=input_shape[-1])
+        input_shape = xpriv.element_spec[0].shape
+        
+        self.hparams = hparams
 
-            # setup optimizers
-            self.optimizer0 = tf.keras.optimizers.Adam(learning_rate=hparams['lr_f'])
-            self.optimizer1 = tf.keras.optimizers.Adam(learning_rate=hparams['lr_tilde'])
-            self.optimizer2 = tf.keras.optimizers.Adam(learning_rate=hparams['lr_D'])
+        # setup dataset
+        self.client_dataset = xpriv.batch(batch_size, drop_remainder=True).repeat(-1)
+        self.attacker_dataset = xpub.batch(batch_size, drop_remainder=True).repeat(-1)
+        self.batch_size = batch_size
+
+        ## setup models
+        make_f, make_tilde_f, make_decoder, make_D = architectures.SETUPS[id_setup]
+
+        self.f = make_f(input_shape)
+        self.tilde_f = make_tilde_f(input_shape)
+
+        assert self.f.output.shape.as_list()[1:] == self.tilde_f.output.shape.as_list()[1:]
+        z_shape = self.tilde_f.output.shape.as_list()[1:]
+
+        self.D = make_D(z_shape)
+        self.decoder = self.loadBiasNetwork(make_decoder, z_shape, channels=input_shape[-1])
+
+        # setup optimizers
+        self.optimizer0 = tf.keras.optimizers.Adam(learning_rate=hparams['lr_f'])
+        self.optimizer1 = tf.keras.optimizers.Adam(learning_rate=hparams['lr_tilde'])
+        self.optimizer2 = tf.keras.optimizers.Adam(learning_rate=hparams['lr_D'])
 
 
 
@@ -177,7 +206,7 @@ class FSHA:
             iterator = tqdm.tqdm(iterator , total=iterations)
 
         i, j = 0, 0
-        print("RUNNING...")
+        self.logger.info("RUNNING...")
         for (x_private, label_private), (x_public, label_public) in iterator:
             log = self.train_step(x_private, x_public, label_private, label_public)
 
@@ -190,7 +219,7 @@ class FSHA:
                 LOG[j] = log
 
                 if verbose:
-                    print("log--%02d%%-%07d] validation: %0.4f" % ( int(i/iterations*100) ,i, VAL) )
+                    self.logger.info("log--%02d%%-%07d] validation: %0.4f" % ( int(i/iterations*100) ,i, VAL) )
 
                 VAL = 0
                 j += 1
