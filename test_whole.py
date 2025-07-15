@@ -37,7 +37,7 @@ fsha = FSHA_distcor.FSHA_dc(xpriv, xpub, id_setup-1, batch_size, hparams)
 
 ##### RUN ATTACK
 
-log_frequency = 500
+log_frequency = 50
 LOG = fsha(10000, verbose=True, progress_bar=False, log_frequency=log_frequency)
 
 

@@ -94,6 +94,9 @@ class FSHA:
             rec_x_private = self.decoder(z_private, training=True)
             ## adversarial loss (f's output must similar be to \tilde{f}'s output):
             adv_private_logits = self.D(z_private, training=True)
+
+            prediction = tf.argmax(adv_private_logits)
+            correct_prediction_argmax = tf.equal(prediction, label_private)
             if self.hparams['WGAN']:
                 print("Use WGAN loss")
                 f_loss = tf.reduce_mean(adv_private_logits)
@@ -151,7 +154,7 @@ class FSHA:
         self.optimizer2.apply_gradients(zip(gradients, var))
 
 
-        return f_loss, tilde_f_loss, D_loss, loss_c_verification
+        return f_loss, tilde_f_loss, D_loss, loss_c_verification, correct_prediction_argmax
 
 
     def gradient_penalty(self, x, x_gen):
@@ -212,14 +215,16 @@ class FSHA:
 
             if i == 0:
                 VAL = log[3]
+                VAL_A = log[4]
             else:
                 VAL += log[3] / log_frequency
+                VAL_A += log[4] / log_frequency
 
             if  i % log_frequency == 0:
                 LOG[j] = log
 
                 if verbose:
-                    self.logger.info("log--%02d%%-%07d] validation: %0.4f" % ( int(i/iterations*100) ,i, VAL) )
+                    self.logger.info("log--%02d%%-%07d] validation: %0.4f acc: %0.4f" % ( int(i/iterations*100) ,i, VAL, VAL_A) )
 
                 VAL = 0
                 j += 1
