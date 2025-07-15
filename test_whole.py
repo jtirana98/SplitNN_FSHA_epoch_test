@@ -3,7 +3,7 @@ import numpy as np
 import tqdm
 import matplotlib.pyplot as plt
 
-import FSHA_distcor
+import FSHA
 import architectures
 import datasets
 from datasets import *
@@ -18,12 +18,8 @@ x_pub = datasets.getImagesDS(xpub, n)
 #### SET-UP ATTACK
 
 batch_size = 64
-id_setup = 4
+id_setup = 4 # kata mia ennoia orizei to cut layer
 hparams = {
-    
-    'alpha1' : 10000, # Extremely high value for alpha1
-    'alpha2' : 50,    # Attacker scales adversarial loss to overwrite alpha1
-    
     'WGAN' : True,
     'gradient_penalty' : 500.,
     'style_loss' : None,
@@ -32,14 +28,13 @@ hparams = {
     'lr_D' : 0.0001,
 }
 
-fsha = FSHA_distcor.FSHA_dc(xpriv, xpub, id_setup-1, batch_size, hparams)
+fsha = FSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
 
 
 ##### RUN ATTACK
 
 log_frequency = 50
 LOG = fsha(10000, verbose=True, progress_bar=False, log_frequency=log_frequency)
-
 
 ##### PLOT LOGS
 
@@ -48,7 +43,7 @@ def plot_log(ax, x, y, label):
     ax.set(title=label)
     ax.grid()
 
-n = 4
+n = 5
 fix, ax = plt.subplots(1, n, figsize=(n*5, 3))
 x = np.arange(0, len(LOG)) * log_frequency 
 

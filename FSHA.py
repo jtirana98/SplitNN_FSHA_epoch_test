@@ -80,9 +80,9 @@ class FSHA:
 
     @tf.function
     def train_step(self, x_private, x_public, label_private, label_public):
-
+        print('here')
         with tf.GradientTape(persistent=True) as tape:
-
+            print('here2')
             #### Virtually, ON THE CLIENT SIDE:
             # clients' smashed data
             z_private = self.f(x_private, training=True)
@@ -95,8 +95,9 @@ class FSHA:
             ## adversarial loss (f's output must similar be to \tilde{f}'s output):
             adv_private_logits = self.D(z_private, training=True)
 
-            prediction = tf.argmax(adv_private_logits)
-            correct_prediction_argmax = tf.equal(prediction, label_private)
+            prediction = tf.cast(tf.argmax(adv_private_logits, axis=1), tf.int32)
+            label_private_casted = tf.cast(label_private, tf.int32)
+            correct_prediction = tf.equal(prediction, label_private_casted)
             if self.hparams['WGAN']:
                 print("Use WGAN loss")
                 f_loss = tf.reduce_mean(adv_private_logits)
@@ -153,8 +154,8 @@ class FSHA:
         gradients = tape.gradient(D_loss, var)
         self.optimizer2.apply_gradients(zip(gradients, var))
 
-
-        return f_loss, tilde_f_loss, D_loss, loss_c_verification, correct_prediction_argmax
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        return f_loss, tilde_f_loss, D_loss, loss_c_verification, accuracy
 
 
     def gradient_penalty(self, x, x_gen):
@@ -202,7 +203,7 @@ class FSHA:
     def __call__(self, iterations, log_frequency=500, verbose=False, progress_bar=True):
 
         n = int(iterations / log_frequency)
-        LOG = np.zeros((n, 4))
+        LOG = np.zeros((n, 5))
 
         iterator = zip(self.client_dataset.take(iterations), self.attacker_dataset.take(iterations))
         if progress_bar:
@@ -210,6 +211,7 @@ class FSHA:
 
         i, j = 0, 0
         self.logger.info("RUNNING...")
+        print('RUNNING')
         for (x_private, label_private), (x_public, label_public) in iterator:
             log = self.train_step(x_private, x_public, label_private, label_public)
 
