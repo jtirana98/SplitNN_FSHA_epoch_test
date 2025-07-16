@@ -3,10 +3,12 @@ import numpy as np
 import tqdm
 import matplotlib.pyplot as plt
 
+import noFSHA
 import FSHA
 import architectures
 import datasets
 from datasets import *
+import datetime
 
 xpriv, xpub = load_mnist()
 
@@ -25,7 +27,7 @@ hparams = {
     'style_loss' : None,
     'lr_f' :  0.00001,
     'lr_tilde' : 0.00001,
-    'lr_D' : 0.0001,
+    'lr_D' : 0.00001,
 }
 
 fsha = FSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
@@ -53,3 +55,6 @@ plot_log(ax[2], x, LOG[:, 2],  label='Loss $D$')
 plot_log(ax[3], x, LOG[:, 3],  label='Reconstruction error (VALIDATION)')
 plot_log(ax[4], x, LOG[:, 4],  label='Accuracy of the model f+D')
 
+
+log_file_name = 'experiment_plt-%s' % (datetime.datetime.now().strftime("%Y-%m-%d-%H:%M-%S"))
+plt.savefig(f"logs_training/plot_{log_file_name}.pdf", format="pdf")  

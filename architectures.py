@@ -132,7 +132,7 @@ def discriminator(input_shape, level):
 
     x = tf.keras.layers.Conv2D(256, 3, 2, padding='same')(x)
     x = tf.keras.layers.Flatten()(x)
-    x = tf.keras.layers.Dense(1)(x)
+    x = tf.keras.layers.Dense(10)(x)
     return tf.keras.Model(xin, x)
 #==========================================================================================
 

@@ -92,12 +92,15 @@ class FSHA:
             rec_x_private = self.decoder(z_private, training=True)
             ## adversarial loss (f's output must similar be to \tilde{f}'s output):
             adv_private_logits = self.D(z_private, training=True)
-
+            
+            
+            label_private_onehot = tf.one_hot(label_private, depth=10, axis=1)
             prediction = tf.cast(tf.argmax(adv_private_logits, axis=1), tf.int32)
             label_private_casted = tf.cast(label_private, tf.int32)
             correct_prediction = tf.equal(prediction, label_private_casted)
+
             if self.hparams['WGAN']:
-                print("Use WGAN loss")
+                print("Use WGAN loss1") #this one
                 f_loss = tf.reduce_mean(adv_private_logits)
             else:
                 f_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(tf.ones_like(adv_private_logits), adv_private_logits, from_logits=True))
@@ -109,11 +112,11 @@ class FSHA:
             rec_x_public = self.decoder(z_public, training=True)
             public_rec_loss = distance_data_loss(x_public, rec_x_public)
             tilde_f_loss = public_rec_loss
-
+            
 
             # discriminator on attacker's feature-space
             adv_public_logits = self.D(z_public, training=True)
-            if self.hparams['WGAN']:
+            if self.hparams['WGAN']: #this one
                 loss_discr_true = tf.reduce_mean( adv_public_logits )
                 loss_discr_fake = -tf.reduce_mean( adv_private_logits)
                 # discriminator's loss
@@ -125,7 +128,7 @@ class FSHA:
                 D_loss = (loss_discr_true + loss_discr_fake) / 2
 
             if 'gradient_penalty' in self.hparams:
-                print("Use GP")
+                print("Use GP1") # this one
                 w = float(self.hparams['gradient_penalty'])
                 D_gradient_penalty = self.gradient_penalty(z_private, z_public)
                 D_loss += D_gradient_penalty * w
@@ -136,7 +139,7 @@ class FSHA:
             ############################################
             ##################################################################
 
-
+        
         # train client's network 
         var = self.f.trainable_variables
         gradients = tape.gradient(f_loss, var)
@@ -151,8 +154,10 @@ class FSHA:
         var = self.D.trainable_variables
         gradients = tape.gradient(D_loss, var)
         self.optimizer2.apply_gradients(zip(gradients, var))
-
+        
+        # tf.print(correct_prediction)
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        # tf.print(accuracy)
         return f_loss, tilde_f_loss, D_loss, loss_c_verification, accuracy
 
 
@@ -215,8 +220,8 @@ class FSHA:
                 VAL = log[3] 
                 VAL_A = log[4]
             else:
-                VAL += log[3] / (log_frequency)
-                VAL_A += log[4] / (log_frequency)
+                VAL += log[3] / log_frequency
+                VAL_A += log[4] / log_frequency
 
             if  i % log_frequency == 0:
                 LOG[j] = log
@@ -277,7 +282,7 @@ class FSHA_binary_property(FSHA):
             ## adversarial loss (f's output must be similar to \tilde{f}'s output):
             adv_private_logits = self.D(z_private, training=True)
             if self.hparams['WGAN']:
-                print("Use WGAN loss")
+                print("Use WGAN loss2")
                 f_loss = tf.reduce_mean(adv_private_logits)
             else:
                 f_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(tf.ones_like(adv_private_logits), adv_private_logits, from_logits=True))
