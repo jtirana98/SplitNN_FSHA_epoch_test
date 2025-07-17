@@ -11,7 +11,8 @@ import datasets
 from datasets import *
 import datetime
 
-xpriv, xpub = load_mnist()
+xpriv = load_mnist()
+xpub = load_fashion_mnist()
 
 n = 15
 x_priv = datasets.getImagesDS(xpriv, n)
@@ -36,8 +37,8 @@ fsha = pretrainedFSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
 
 ##### RUN ATTACK
 
-log_frequency = 50
-LOG = fsha(10000, verbose=True, progress_bar=False, num_pretrains=5, log_frequency=log_frequency)
+log_frequency = 500
+LOG = fsha(10000, verbose=True, progress_bar=False, num_pretrains=1000, log_frequency=log_frequency)
 
 ##### PLOT LOGS
 
