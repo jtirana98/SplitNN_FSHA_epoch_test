@@ -164,11 +164,11 @@ class FSHA:
             accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
             # tf.print(accuracy)
         else:
-            tilde_f_loss = 0
+            tilde_f_loss = 1
             tilde_f_loss = tf.cast(tilde_f_loss, tf.float32)
-            loss_c_verification = 0
+            loss_c_verification = 1
             loss_c_verification = tf.cast(loss_c_verification, tf.float32)
-            f_loss = 0
+            f_loss = 1
             f_loss = tf.cast(f_loss, tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:
