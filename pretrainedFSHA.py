@@ -7,6 +7,9 @@ import os
 import time
 import datetime
 
+
+tf.keras.backend.set_floatx('float32')
+
 def distance_data_loss(a,b):
     l = tf.losses.MeanSquaredError()
     return l(a, b)
@@ -162,8 +165,11 @@ class FSHA:
             # tf.print(accuracy)
         else:
             tilde_f_loss = 0
+            tilde_f_loss = tf.cast(tilde_f_loss, tf.float32)
             loss_c_verification = 0
+            loss_c_verification = tf.cast(loss_c_verification, tf.float32)
             f_loss = 0
+            f_loss = tf.cast(f_loss, tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:
                 #### Virtually, ON THE CLIENT SIDE:
@@ -257,12 +263,11 @@ class FSHA:
         if progress_bar:
             iterator = tqdm.tqdm(iterator , total=iterations)
         
-        is_fsha = False
+        is_fsha = True
         i, j = 0, 0
         self.logger.info("RUNNING...")
         for (x_private, label_private), (x_public, label_public) in iterator:
-            if i >= num_pretrains:
-                is_fsha = True
+            
 
             log = self.train_step(x_private, x_public, label_private, label_public, is_fsha)
             if i == 0:
@@ -284,4 +289,9 @@ class FSHA:
 
 
             i += 1
+
+            if i >= num_pretrains:
+                is_fsha = True
+            else:
+                is_fsha = False
         return LOG

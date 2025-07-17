@@ -37,7 +37,7 @@ fsha = pretrainedFSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
 ##### RUN ATTACK
 
 log_frequency = 50
-LOG = fsha(10000, verbose=True, progress_bar=False, num_pretrains=150, log_frequency=log_frequency)
+LOG = fsha(10000, verbose=True, progress_bar=False, num_pretrains=5, log_frequency=log_frequency)
 
 ##### PLOT LOGS
 
