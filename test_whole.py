@@ -15,8 +15,7 @@ xpriv = load_mnist()
 xpub = load_fashion_mnist()
 
 n = 15
-x_priv = datasets.getImagesDS(xpriv, n)
-x_pub = datasets.getImagesDS(xpub, n)
+
 
 
 #### SET-UP ATTACK
