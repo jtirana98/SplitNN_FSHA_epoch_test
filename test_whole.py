@@ -11,8 +11,8 @@ import datasets
 from datasets import *
 import datetime
 
-xpriv = load_mnist()
-xpub = load_fashion_mnist()
+xpriv, _ = load_mnist()
+_, xpub = load_fashion_mnist()
 
 n = 15
 
