@@ -97,9 +97,8 @@ class FSHA:
         self.optimizer2.apply_gradients(zip(grads_client, self.f.trainable_variables))
 
 
-        tf.print(correct_prediction)
+        
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        tf.print(accuracy)
         return  D_loss, accuracy
 
     # EDWWWW

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 import noFSHA
 import FSHA
+import pretrainedFSHA
 import architectures
 import datasets
 from datasets import *
@@ -30,13 +31,13 @@ hparams = {
     'lr_D' : 0.00001,
 }
 
-fsha = FSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
+fsha = pretrainedFSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
 
 
 ##### RUN ATTACK
 
 log_frequency = 50
-LOG = fsha(10000, verbose=True, progress_bar=False, log_frequency=log_frequency)
+LOG = fsha(10000, verbose=True, progress_bar=False, num_pretrains=150, log_frequency=log_frequency)
 
 ##### PLOT LOGS
 
