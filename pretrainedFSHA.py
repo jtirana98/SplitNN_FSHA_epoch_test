@@ -194,8 +194,8 @@ class FSHA:
                 grads_client = tape.gradient(z_private, self.f.trainable_variables, output_gradients=dz)
 
                 # Apply gradients
-                self.optimizer0.apply_gradients(zip(grads_server, self.D.trainable_variables))
-                self.optimizer2.apply_gradients(zip(grads_client, self.f.trainable_variables))
+                self.optimizer2.apply_gradients(zip(grads_server, self.D.trainable_variables))
+                self.optimizer0.apply_gradients(zip(grads_client, self.f.trainable_variables))
 
 
                 tf.print(correct_prediction)
