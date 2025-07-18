@@ -100,7 +100,7 @@ class FSHA:
             correct_prediction = tf.equal(prediction, label_private_casted)
 
             if self.hparams['WGAN']:
-                print("Use WGAN loss1") #this one
+                # print("Use WGAN loss1") #this one
                 f_loss = tf.reduce_mean(adv_private_logits)
             else:
                 f_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(tf.ones_like(adv_private_logits), adv_private_logits, from_logits=True))
@@ -128,7 +128,7 @@ class FSHA:
                 D_loss = (loss_discr_true + loss_discr_fake) / 2
 
             if 'gradient_penalty' in self.hparams:
-                print("Use GP1") # this one
+                # print("Use GP1") # this one
                 w = float(self.hparams['gradient_penalty'])
                 D_gradient_penalty = self.gradient_penalty(z_private, z_public)
                 D_loss += D_gradient_penalty * w
@@ -201,11 +201,21 @@ class FSHA:
         z_private_control = self.tilde_f(x_private, training=False)
         control = self.decoder(z_private_control, training=False)
         return tilde_x_private.numpy(), control.numpy()
+    
+    def attack_other(self, x_private, f_other):
+        # smashed data sent from the client:
+        z_private = f_other(x_private, training=False)
+        # recover private data from smashed data
+        tilde_x_private = self.decoder(z_private, training=False)
+
+        return tilde_x_private
+
 
     # EDWWWW
     def __call__(self, iterations, log_frequency=500, verbose=False, progress_bar=True):
-
         n = int(iterations / log_frequency)
+        if n < 1:
+            n = 1
         LOG = np.zeros((n, 5))
 
         iterator = zip(self.client_dataset.take(iterations), self.attacker_dataset.take(iterations))
@@ -282,7 +292,7 @@ class FSHA_binary_property(FSHA):
             ## adversarial loss (f's output must be similar to \tilde{f}'s output):
             adv_private_logits = self.D(z_private, training=True)
             if self.hparams['WGAN']:
-                print("Use WGAN loss2")
+                # print("Use WGAN loss2")
                 f_loss = tf.reduce_mean(adv_private_logits)
             else:
                 f_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(tf.ones_like(adv_private_logits), adv_private_logits, from_logits=True))
@@ -311,7 +321,7 @@ class FSHA_binary_property(FSHA):
                 D_loss = (loss_discr_true + loss_discr_fake) / 2
 
             if 'gradient_penalty' in self.hparams:
-                print("Use GP")
+                # print("Use GP")
                 w = float(self.hparams['gradient_penalty'])
                 D_gradient_penalty = self.gradient_penalty(z_private, z_public)
                 D_loss += D_gradient_penalty * w
