@@ -31,13 +31,13 @@ hparams = {
     'lr_D' : 0.00001,
 }
 
-fsha = FSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
+fsha = pretrainedFSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
 
 
 ##### RUN ATTACK
 
 log_frequency = 500
-LOG = fsha(10000, verbose=True, progress_bar=False, log_frequency=log_frequency)
+LOG = fsha(10000, verbose=True, progress_bar=False, num_pretrains=2000, log_frequency=log_frequency)
 
 ##### PLOT LOGS
 

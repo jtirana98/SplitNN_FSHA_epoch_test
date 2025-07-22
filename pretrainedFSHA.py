@@ -294,4 +294,6 @@ class FSHA:
                 is_fsha = True
             else:
                 is_fsha = False
+	self.logger.info("ALL RESULTS")
+        self.logger.info(LOG[3])
         return LOG
