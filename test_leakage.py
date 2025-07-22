@@ -35,7 +35,7 @@ fsha = FSHA.FSHA(xpriv, xpub, id_setup-1, batch_size, hparams)
 ##### TRAIN ATTACK MODEL
 
 log_frequency = 500
-LOG = fsha(10000, verbose=True, progress_bar=False, log_frequency=log_frequency)
+LOG = fsha(1000, verbose=True, progress_bar=False, log_frequency=log_frequency)
 
 #### TRAIN AND TEST THE REGURAL MODEL
 
