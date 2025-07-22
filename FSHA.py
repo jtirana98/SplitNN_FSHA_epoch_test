@@ -245,8 +245,8 @@ class FSHA:
 
 
             i += 1
-	self.logger.info("ALL RESULTS")
-	self.logger.info(LOG[3])
+        self.logger.info("ALL RESULTS")
+        self.logger.info(LOG[3])
         return LOG
 
 #----------------------------------------------------------------------------------------------------------------------
